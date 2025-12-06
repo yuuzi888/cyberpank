@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>///NEO-TOKYO_GRID///</title>
+    
+    <style>
+        /* --------------------
+           1. ベースとフォント設定
+           -------------------- */
+        body {
+            background-color: #0d0d0d; /* 真っ黒に近い背景 */
+            color: #00ff66; /* ネオングリーンをメインカラーに */
+            font-family: 'Consolas', 'Monaco', monospace; /* 等幅フォントでターミナル感を出す */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* グリッチエフェクトで横スクロールバーが出ないように */
+            font-size: 16px;
+        }
+
+        /* ヘディングと重要テキスト */
+        h1, h2, h3 {
+            color: #33ffff; /* シアン（ネオンブルー）を強調色に */
+            text-shadow: 0 0 5px rgba(51, 255, 255, 0.7); /* ネオン発光エフェクト */
+            border-bottom: 1px solid rgba(0, 255, 102, 0.3);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        /* --------------------
+           2. 画面とレイアウト
+           -------------------- */
+        #terminal-screen {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 3px solid #00ff66;
+            box-shadow: 0 0 20px #00ff66, inset 0 0 20px #00ff66; /* 画面全体を発光させる */
+            background-color: rgba(13, 13, 13, 0.9); /* 少し透明な背景でノイズ感を出す */
+        }
+
+        /* ヘッダーナビゲーション */
+        #header-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #33ffff;
+        }
+
+        #header-grid h1 {
+            font-size: 1.5em;
+            margin: 0;
+            border-bottom: none;
+        }
+
+        nav a {
+            color: #00ff66;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            color: #fff;
+            text-shadow: 0 0 10px #33ffff;
+        }
+
+        /* --------------------
+           3. データブロックとカード
+           -------------------- */
+        .data-block {
+            margin: 40px 0;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05); /* 薄い背景でブロックを分ける */
+            border-left: 5px solid #00ff66;
+        }
+
+        .code-output p {
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        /* タイピングアニメーションの準備 */
+        .matrix-text {
+            color: #00ff66;
+            animation: typing 4s steps(40, end); 
+            overflow: hidden;
+            white-space: nowrap;
+            width: fit-content; /* アニメーションのために幅を限定 */
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        /* プロジェクトカード */
+        .project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            padding: 20px;
+            border: 1px solid rgba(51, 255, 255, 0.5);
+            background-color: rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px #33ffff; /* ホバーでさらに発光 */
+        }
+
+        /* スキルリスト */
+        .skill-matrix {
+            list-style: none;
+            padding: 0;
+        }
+
+        .skill-matrix li {
+            padding: 5px 0;
+            border-bottom: 1px dashed rgba(0, 255, 102, 0.2);
+        }
+        
+        .skill-name {
+            color: #ffcc00; /* 別の強調色 */
+            font-weight: bold;
+        }
+
+        /* --------------------
+           4. アクションボタン
+           -------------------- */
+        .action-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: transparent;
+            border: 2px solid #00ff66;
+            color: #00ff66;
+            text-decoration: none;
+            margin-top: 10px;
+            clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%); /* 斜めのカットを入れる */
+            transition: all 0.2s;
+            font-size: 0.9em;
+        }
+
+        .action-btn:hover {
+            background-color: #00ff66;
+            color: #0d0d0d;
+        }
+
+        /* --------------------
+           5. グリッチ/ノイズ表現 (上級)
+           -------------------- */
+        #footer-console {
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 255, 102, 0.3);
+            text-align: right;
+            font-size: 0.8em;
+        }
+
+        /* body のノイズを表現する擬似要素 */
+        .glitch-bg::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%; /* スキャンラインとカラーノイズ */
+            z-index: -1;
+            opacity: 0.7;
+            animation: flicker 0.15s infinite alternate; /* 細かいちらつき */
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.9; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body class="glitch-bg">
+    <div id="terminal-screen">
+
+        <header id="header-grid">
+            <h1>>_ [CYBER-NET] ACCESS GRANTED</h1>
+            <nav>
+                <a href="#data-stream" class="nav-link">DATA STREAM</a>
+                <a href="#projects" class="nav-link">MODULES</a>
+                <a href="#contact" class="nav-link">SECURE COMM</a>
+            </nav>
+        </header>
+
+        <main id="data-stream">
+
+            <section id="profile-log" class="data-block">
+                <h2>// USER LOG: [YOUR NAME] //</h2>
+                <div class="code-output">
+                    <p>STATUS: <span style="color:#ffcc00;">[ONLINE]</span> // ROLE: [ENGINEER / DESIGNER ETC]</p>
+                    <p>LOCATION: [HIDDEN] // SECTOR: [WEB DEVELOPMENT]</p>
+                    <p class="matrix-text">-- INITIATING DATA UPLOAD --</p>
+                </div>
+            </section>
+
+            <section id="skills" class="data-block">
+                <h2>// CORE COMMANDS //</h2>
+                <ul class="skill-matrix">
+                    <li><span class="skill-name">JAVASCRIPT</span> [LEVEL: 90%]</li>
+                    <li><span class="skill-name">REACT</span> [LEVEL: 75%]</li>
+                    <li><span class="skill-name">PYTHON</span> [LEVEL: 60%]</li>
+                    <li><span class="skill-name">DATABASES</span> [LEVEL: 50%]</li>
+                </ul>
+            </section>
+
+            <section id="projects" class="data-block">
+                <h2>// MODULES: ACTIVATED PROJECTS //</h2>
+                <div class="project-list">
+                    <article class="project-card neon-border">
+                        <h3>[PROJECT_A] - DECODED</h3>
+                        <p>TASK: Создание высококомпетентного веб-сайта</p>
+                        <a href="#" class="action-btn">VIEW_SOURCE</a>
+                    </article>
+                    <article class="project-card neon-border">
+                        <h3>[PROJECT_B] - PATCH_APPLIED</h3>
+                        <p>TASK: Creating a highly complete website</p>
+                        <a href="#" class="action-btn">VIEW_SOURCE</a>
+                    </article>
+                </div>
+            </section>
+
+            <section id="contact" class="data-block">
+                <h2>// SECURE COMM: INITIATE ENCRYPTED MESSAGE //</h2>
+                <p>TARGET ADDRESS: <span style="color:#ffcc00;">[WHITE.CANADA.COM@GMAIL.COM]</span></p>
+                <a href="mailto:your_email@domain.com" class="action-btn">SEND_MAIL_PACKET</a>
+            </section>
+
+        </main>
+
+        <footer id="footer-console">
+            <p>COMMAND: &gt; SYSTEM ONLINE. ALL RIGHTS RESERVED [YEAR]</p>
+        </footer>
+
+    </div>
+</body>
+</html>
